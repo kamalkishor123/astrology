@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Clock, Star, Calendar, CheckCircle, AlertCircle } from 'lucide-react-native';
+import { ArrowLeft, Clock, Star, Calendar, CircleCheck as CheckCircle, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { supabase, Remedy } from '@/lib/supabase';

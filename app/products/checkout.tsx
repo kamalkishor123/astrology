@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, MapPin, CreditCard, Wallet, IndianRupee, CheckCircle } from 'lucide-react-native';
+import { ArrowLeft, MapPin, CreditCard, Wallet, IndianRupee, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
 
