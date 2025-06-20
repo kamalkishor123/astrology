@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'rea
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Sparkles, Star, Heart, Briefcase, Shield, Gift } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 const zodiacSigns = [
   { name: 'Aries', symbol: '♈', color: '#FF6B6B' },
@@ -13,10 +14,34 @@ const zodiacSigns = [
 ];
 
 const quickServices = [
-  { icon: Star, title: 'Daily Horoscope', subtitle: 'Your daily guidance', color: '#F59E0B' },
-  { icon: Heart, title: 'Love Match', subtitle: 'Find compatibility', color: '#EF4444' },
-  { icon: Briefcase, title: 'Career Guide', subtitle: 'Professional insights', color: '#10B981' },
-  { icon: Shield, title: 'Remedies', subtitle: 'Spiritual solutions', color: '#8B5CF6' },
+  { 
+    icon: Star, 
+    title: 'Daily Horoscope', 
+    subtitle: 'Your daily guidance', 
+    color: '#F59E0B',
+    route: '/daily-horoscope'
+  },
+  { 
+    icon: Heart, 
+    title: 'Love Match', 
+    subtitle: 'Find compatibility', 
+    color: '#EF4444',
+    route: '/love-match'
+  },
+  { 
+    icon: Briefcase, 
+    title: 'Career Guide', 
+    subtitle: 'Professional insights', 
+    color: '#10B981',
+    route: '/career-guide'
+  },
+  { 
+    icon: Shield, 
+    title: 'Remedies', 
+    subtitle: 'Spiritual solutions', 
+    color: '#8B5CF6',
+    route: '/spiritual-remedies'
+  },
 ];
 
 export default function HomeScreen() {
@@ -69,7 +94,10 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>Quick Services</Text>
           <View style={styles.servicesGrid}>
             {quickServices.map((service, index) => (
-              <TouchableOpacity key={index} style={styles.serviceCard}>
+              <TouchableOpacity 
+                key={index} 
+                style={styles.serviceCard}
+                onPress={() => router.push(service.route)}>
                 <View style={[styles.serviceIcon, { backgroundColor: service.color + '20' }]}>
                   <service.icon color={service.color} size={24} />
                 </View>
@@ -86,7 +114,10 @@ export default function HomeScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.zodiacContainer}>
               {zodiacSigns.map((sign, index) => (
-                <TouchableOpacity key={index} style={styles.zodiacCard}>
+                <TouchableOpacity 
+                  key={index} 
+                  style={styles.zodiacCard}
+                  onPress={() => router.push('/(tabs)/horoscope')}>
                   <Text style={[styles.zodiacSymbol, { color: sign.color }]}>
                     {sign.symbol}
                   </Text>
@@ -123,7 +154,9 @@ export default function HomeScreen() {
         {/* Astrologer Spotlight */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Featured Astrologer</Text>
-          <View style={styles.astrologerCard}>
+          <TouchableOpacity 
+            style={styles.astrologerCard}
+            onPress={() => router.push('/(tabs)/consultations')}>
             <Image
               source={{ uri: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2' }}
               style={styles.astrologerImage}
@@ -137,10 +170,12 @@ export default function HomeScreen() {
                 <Text style={styles.rating}>4.8 (2.3k reviews)</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.consultButton}>
+            <TouchableOpacity 
+              style={styles.consultButton}
+              onPress={() => router.push('/(tabs)/consultations')}>
               <Text style={styles.consultButtonText}>Consult</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Premium Features */}
@@ -154,7 +189,9 @@ export default function HomeScreen() {
               <Text style={styles.premiumSubtitle}>
                 Get detailed birth chart analysis, daily remedies, and unlimited consultations
               </Text>
-              <TouchableOpacity style={styles.premiumButton}>
+              <TouchableOpacity 
+                style={styles.premiumButton}
+                onPress={() => router.push('/auth')}>
                 <Text style={styles.premiumButtonText}>Upgrade Now</Text>
               </TouchableOpacity>
             </View>

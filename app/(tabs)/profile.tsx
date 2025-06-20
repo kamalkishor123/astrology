@@ -1,8 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User, Settings, Bell, CreditCard, Star, Gift, CircleHelp as HelpCircle, LogOut, ChevronRight, Crown } from 'lucide-react-native';
 import { useState } from 'react';
+import { router } from 'expo-router';
+import { supabase } from '@/lib/supabase';
 
 const profileStats = [
   { label: 'Consultations', value: '12' },
@@ -11,17 +13,55 @@ const profileStats = [
 ];
 
 const menuItems = [
-  { icon: User, title: 'Edit Profile', subtitle: 'Update your personal information', color: '#3B82F6' },
-  { icon: CreditCard, title: 'Wallet & Payments', subtitle: 'Manage your wallet and payment methods', color: '#10B981' },
-  { icon: Star, title: 'My Reports', subtitle: 'View all your astrology reports', color: '#F59E0B' },
-  { icon: Bell, title: 'Notifications', subtitle: 'Manage your notification preferences', color: '#8B5CF6' },
-  { icon: Gift, title: 'Refer & Earn', subtitle: 'Invite friends and earn rewards', color: '#EF4444' },
-  { icon: HelpCircle, title: 'Help & Support', subtitle: 'Get help and contact support', color: '#6B7280' },
-  { icon: Settings, title: 'Settings', subtitle: 'App settings and preferences', color: '#374151' },
+  { icon: User, title: 'Edit Profile', subtitle: 'Update your personal information', color: '#3B82F6', route: '/profile/edit' },
+  { icon: CreditCard, title: 'Wallet & Payments', subtitle: 'Manage your wallet and payment methods', color: '#10B981', route: '/profile/wallet' },
+  { icon: Star, title: 'My Reports', subtitle: 'View all your astrology reports', color: '#F59E0B', route: '/profile/reports' },
+  { icon: Bell, title: 'Notifications', subtitle: 'Manage your notification preferences', color: '#8B5CF6', route: '/profile/notifications' },
+  { icon: Gift, title: 'Refer & Earn', subtitle: 'Invite friends and earn rewards', color: '#EF4444', route: '/profile/referral' },
+  { icon: HelpCircle, title: 'Help & Support', subtitle: 'Get help and contact support', color: '#6B7280', route: '/profile/support' },
+  { icon: Settings, title: 'Settings', subtitle: 'App settings and preferences', color: '#374151', route: '/profile/settings' },
 ];
 
 export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const { error } = await supabase.auth.signOut();
+              if (error) {
+                Alert.alert('Error', 'Failed to logout. Please try again.');
+              } else {
+                router.replace('/auth');
+              }
+            } catch (error) {
+              Alert.alert('Error', 'An unexpected error occurred.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleMenuPress = (route: string) => {
+    // For now, show a coming soon message for unimplemented routes
+    if (route.startsWith('/profile/')) {
+      Alert.alert('Coming Soon', 'This feature will be available in the next update.');
+    } else {
+      router.push(route);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,7 +80,9 @@ export default function ProfileScreen() {
               <Text style={styles.profileEmail}>arjun.sharma@gmail.com</Text>
               <Text style={styles.profilePhone}>+91 98765 43210</Text>
             </View>
-            <TouchableOpacity style={styles.editButton}>
+            <TouchableOpacity 
+              style={styles.editButton}
+              onPress={() => handleMenuPress('/profile/edit')}>
               <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
           </View>
@@ -57,7 +99,9 @@ export default function ProfileScreen() {
               <Text style={styles.premiumSubtitle}>
                 Get unlimited consultations, detailed reports, and priority support
               </Text>
-              <TouchableOpacity style={styles.premiumButton}>
+              <TouchableOpacity 
+                style={styles.premiumButton}
+                onPress={() => router.push('/auth')}>
                 <Text style={styles.premiumButtonText}>Upgrade Now</Text>
               </TouchableOpacity>
             </View>
@@ -101,35 +145,47 @@ export default function ProfileScreen() {
 
         {/* Wallet Balance */}
         <View style={styles.section}>
-          <View style={styles.walletCard}>
+          <TouchableOpacity 
+            style={styles.walletCard}
+            onPress={() => handleMenuPress('/profile/wallet')}>
             <View style={styles.walletHeader}>
               <CreditCard color="#10B981" size={24} />
               <Text style={styles.walletTitle}>Wallet Balance</Text>
             </View>
             <Text style={styles.walletBalance}>₹2,450</Text>
-            <TouchableOpacity style={styles.rechargeButton}>
+            <TouchableOpacity 
+              style={styles.rechargeButton}
+              onPress={() => handleMenuPress('/profile/wallet')}>
               <Text style={styles.rechargeButtonText}>Recharge Wallet</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Quick Actions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           <View style={styles.quickActionsGrid}>
-            <TouchableOpacity style={styles.quickActionCard}>
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => router.push('/(tabs)/horoscope')}>
               <Star color="#F59E0B" size={24} />
               <Text style={styles.quickActionText}>Daily Horoscope</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quickActionCard}>
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => router.push('/love-match')}>
               <User color="#8B5CF6" size={24} />
               <Text style={styles.quickActionText}>Match Making</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quickActionCard}>
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => router.push('/(tabs)/kundli')}>
               <Gift color="#EF4444" size={24} />
               <Text style={styles.quickActionText}>Free Report</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quickActionCard}>
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => router.push('/spiritual-remedies')}>
               <Bell color="#3B82F6" size={24} />
               <Text style={styles.quickActionText}>Remedies</Text>
             </TouchableOpacity>
@@ -141,7 +197,10 @@ export default function ProfileScreen() {
           <Text style={styles.sectionTitle}>Account</Text>
           <View style={styles.menuContainer}>
             {menuItems.map((item, index) => (
-              <TouchableOpacity key={index} style={styles.menuItem}>
+              <TouchableOpacity 
+                key={index} 
+                style={styles.menuItem}
+                onPress={() => handleMenuPress(item.route)}>
                 <View style={[styles.menuIcon, { backgroundColor: item.color + '20' }]}>
                   <item.icon color={item.color} size={20} />
                 </View>
@@ -176,7 +235,7 @@ export default function ProfileScreen() {
 
         {/* Logout */}
         <View style={styles.section}>
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <LogOut color="#EF4444" size={20} />
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
