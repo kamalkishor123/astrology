@@ -197,6 +197,50 @@ export default function HomeScreen() {
             </View>
           </LinearGradient>
         </View>
+
+        {/* Astro Store */}
+        <View style={styles.section}>
+          <View style={styles.storeHeader}>
+            <Text style={styles.sectionTitle}>Astro Store</Text>
+            <TouchableOpacity onPress={() => router.push('/products')}>
+              <Text style={styles.viewAllText}>View All</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.productsContainer}>
+              <TouchableOpacity 
+                style={styles.productCard}
+                onPress={() => router.push('/products')}>
+                <Image
+                  source={{ uri: 'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' }}
+                  style={styles.productImage}
+                />
+                <Text style={styles.productName}>Ruby Ring</Text>
+                <Text style={styles.productPrice}>₹25,000</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.productCard}
+                onPress={() => router.push('/products')}>
+                <Image
+                  source={{ uri: 'https://images.pexels.com/photos/6787202/pexels-photo-6787202.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' }}
+                  style={styles.productImage}
+                />
+                <Text style={styles.productName}>Shree Yantra</Text>
+                <Text style={styles.productPrice}>₹2,500</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.productCard}
+                onPress={() => router.push('/products')}>
+                <Image
+                  source={{ uri: 'https://images.pexels.com/photos/6787202/pexels-photo-6787202.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' }}
+                  style={styles.productImage}
+                />
+                <Text style={styles.productName}>Rudraksha Mala</Text>
+                <Text style={styles.productPrice}>₹1,500</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -461,5 +505,51 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-SemiBold',
     color: '#8B5CF6',
+  },
+  storeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  viewAllText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#F97316',
+  },
+  productsContainer: {
+    flexDirection: 'row',
+    paddingRight: 20,
+  },
+  productCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    marginRight: 12,
+    alignItems: 'center',
+    width: 120,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  productImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  productName: {
+    fontSize: 12,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  productPrice: {
+    fontSize: 12,
+    fontFamily: 'Inter-SemiBold',
+    color: '#10B981',
   },
 });
