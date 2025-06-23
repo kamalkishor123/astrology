@@ -4,7 +4,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Star, ShoppingCart, Heart, Share2, IndianRupee, Shield, Truck, RotateCcw } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { supabase, Product } from '@/lib/supabase';
+
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  discount_price?: number;
+  images: string[];
+  rating: number;
+  total_reviews: number;
+  specifications?: any;
+}
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -19,23 +31,51 @@ export default function ProductDetailScreen() {
   }, [id]);
 
   const fetchProduct = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching product:', error);
-      } else {
-        setProduct(data);
+    // Simulate API call with fallback data
+    const fallbackProducts: Product[] = [
+      {
+        id: '1',
+        name: 'Natural Ruby Ring',
+        category: 'gemstone',
+        description: 'Certified natural ruby set in 18k gold ring. Enhances Sun energy and brings leadership qualities. This premium gemstone is carefully selected for its clarity and astrological benefits.',
+        price: 25000,
+        discount_price: 22500,
+        images: [
+          'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=2',
+          'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=2'
+        ],
+        rating: 4.8,
+        total_reviews: 156,
+        specifications: {
+          weight: '3.5 carats',
+          metal: '18k Gold',
+          certification: 'GIA Certified',
+          origin: 'Burma'
+        }
+      },
+      {
+        id: '2',
+        name: 'Shree Yantra - Copper',
+        category: 'yantra',
+        description: 'Handcrafted copper Shree Yantra for wealth and prosperity. Energized by Vedic mantras and blessed by experienced priests.',
+        price: 2500,
+        images: [
+          'https://images.pexels.com/photos/6787202/pexels-photo-6787202.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&dpr=2'
+        ],
+        rating: 4.6,
+        total_reviews: 89,
+        specifications: {
+          material: 'Pure Copper',
+          size: '6 inches',
+          energized: 'Yes',
+          weight: '500g'
+        }
       }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
+    ];
+
+    const foundProduct = fallbackProducts.find(p => p.id === id);
+    setProduct(foundProduct || fallbackProducts[0]);
+    setLoading(false);
   };
 
   const handleAddToCart = () => {
@@ -92,7 +132,7 @@ export default function ProductDetailScreen() {
         {/* Product Images */}
         <View style={styles.imageSection}>
           <Image
-            source={{ uri: product.images[selectedImage] || 'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg' }}
+            source={{ uri: product.images[selectedImage] }}
             style={styles.mainImage}
           />
           <TouchableOpacity

@@ -31,6 +31,7 @@ const careerAspects = [
     title: 'Job Satisfaction',
     icon: Star,
     color: '#8B5CF6',
+    
     rating: 4,
     description: 'High satisfaction in current role with potential for creative projects.'
   }

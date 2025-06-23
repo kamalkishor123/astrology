@@ -2,58 +2,24 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput 
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MessageCircle, Phone, Video, Star, Search, Filter, Clock, IndianRupee } from 'lucide-react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { router } from 'expo-router';
+import { supabase } from '@/lib/supabase';
 
-const astrologers = [
-  {
-    id: '1',
-    name: 'Pandit Rajesh Sharma',
-    image: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
-    specialty: 'Vedic Astrology',
-    experience: '15+ years',
-    rating: 4.8,
-    reviews: 2340,
-    languages: ['Hindi', 'English'],
-    rate: 35,
-    status: 'online'
-  },
-  {
-    id: '2',
-    name: 'Dr. Priya Gupta',
-    image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
-    specialty: 'Numerology & Tarot',
-    experience: '12+ years',
-    rating: 4.9,
-    reviews: 1890,
-    languages: ['Hindi', 'English', 'Marathi'],
-    rate: 42,
-    status: 'online'
-  },
-  {
-    id: '3',
-    name: 'Acharya Vikram Singh',
-    image: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
-    specialty: 'Palmistry & Face Reading',
-    experience: '20+ years',
-    rating: 4.7,
-    reviews: 3250,
-    languages: ['Hindi', 'English', 'Punjabi'],
-    rate: 28,
-    status: 'busy'
-  },
-  {
-    id: '4',
-    name: 'Guru Meera Devi',
-    image: 'https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
-    specialty: 'Relationship & Career',
-    experience: '18+ years',
-    rating: 4.6,
-    reviews: 2156,
-    languages: ['Hindi', 'English', 'Bengali'],
-    rate: 38,
-    status: 'online'
-  }
-];
+interface Astrologer {
+  id: string;
+  name: string;
+  image_url?: string;
+  specialties: string[];
+  experience_years: number;
+  languages: string[];
+  rating: number;
+  total_reviews: number;
+  rate_per_minute: number;
+  is_online: boolean;
+  is_verified: boolean;
+  bio?: string;
+}
 
 const categories = [
   { name: 'All', active: true },
@@ -66,6 +32,97 @@ const categories = [
 export default function ConsultationsScreen() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchAstrologers();
+  }, []);
+
+  const fetchAstrologers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('astrologers')
+        .select('*')
+        .order('rating', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching astrologers:', error);
+        // Use fallback data if database fails
+        setAstrologers(getFallbackAstrologers());
+      } else {
+        setAstrologers(data || getFallbackAstrologers());
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setAstrologers(getFallbackAstrologers());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFallbackAstrologers = (): Astrologer[] => [
+    {
+      id: '1',
+      name: 'Pandit Rajesh Sharma',
+      image_url: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      specialties: ['Vedic Astrology', 'Kundli Analysis'],
+      experience_years: 15,
+      rating: 4.8,
+      total_reviews: 2340,
+      languages: ['Hindi', 'English'],
+      rate_per_minute: 35,
+      is_online: true,
+      is_verified: true,
+      bio: 'Expert in Vedic astrology with over 15 years of experience.'
+    },
+    {
+      id: '2',
+      name: 'Dr. Priya Gupta',
+      image_url: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      specialties: ['Numerology', 'Tarot Reading'],
+      experience_years: 12,
+      rating: 4.9,
+      total_reviews: 1890,
+      languages: ['Hindi', 'English', 'Marathi'],
+      rate_per_minute: 42,
+      is_online: true,
+      is_verified: true,
+      bio: 'Renowned numerologist and tarot reader.'
+    },
+    {
+      id: '3',
+      name: 'Acharya Vikram Singh',
+      image_url: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      specialties: ['Palmistry', 'Face Reading'],
+      experience_years: 20,
+      rating: 4.7,
+      total_reviews: 3250,
+      languages: ['Hindi', 'English', 'Punjabi'],
+      rate_per_minute: 28,
+      is_online: false,
+      is_verified: true,
+      bio: 'Master palmist with expertise in face reading.'
+    },
+    {
+      id: '4',
+      name: 'Guru Meera Devi',
+      image_url: 'https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      specialties: ['Relationship Counseling', 'Career Guidance'],
+      experience_years: 18,
+      rating: 4.6,
+      total_reviews: 2156,
+      languages: ['Hindi', 'English', 'Bengali'],
+      rate_per_minute: 38,
+      is_online: true,
+      is_verified: true,
+      bio: 'Spiritual healer and relationship counselor.'
+    }
+  ];
+
+  const handleStartConsultation = (astrologer: Astrologer, type: 'chat' | 'call' | 'video') => {
+    router.push(`/chat/${astrologer.id}?type=${type}&name=${encodeURIComponent(astrologer.name)}`);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -140,88 +197,108 @@ export default function ConsultationsScreen() {
         </View>
 
         {/* Featured Astrologer */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Featured Astrologer</Text>
-          <LinearGradient
-            colors={['#F97316', '#FB923C']}
-            style={styles.featuredCard}>
-            <Image
-              source={{ uri: astrologers[0].image }}
-              style={styles.featuredImage}
-            />
-            <View style={styles.featuredInfo}>
-              <Text style={styles.featuredName}>{astrologers[0].name}</Text>
-              <Text style={styles.featuredSpecialty}>{astrologers[0].specialty}</Text>
-              <View style={styles.featuredRating}>
-                <Star color="#FFFFFF" size={16} fill="#FFFFFF" />
-                <Text style={styles.featuredRatingText}>
-                  {astrologers[0].rating} ({astrologers[0].reviews} reviews)
-                </Text>
+        {astrologers.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Featured Astrologer</Text>
+            <LinearGradient
+              colors={['#F97316', '#FB923C']}
+              style={styles.featuredCard}>
+              <Image
+                source={{ uri: astrologers[0].image_url }}
+                style={styles.featuredImage}
+              />
+              <View style={styles.featuredInfo}>
+                <Text style={styles.featuredName}>{astrologers[0].name}</Text>
+                <Text style={styles.featuredSpecialty}>{astrologers[0].specialties.join(', ')}</Text>
+                <View style={styles.featuredRating}>
+                  <Star color="#FFFFFF" size={16} fill="#FFFFFF" />
+                  <Text style={styles.featuredRatingText}>
+                    {astrologers[0].rating} ({astrologers[0].total_reviews} reviews)
+                  </Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.featuredButton}
+                  onPress={() => handleStartConsultation(astrologers[0], 'chat')}>
+                  <Text style={styles.featuredButtonText}>Chat Now</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.featuredButton}>
-                <Text style={styles.featuredButtonText}>Chat Now</Text>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-        </View>
+            </LinearGradient>
+          </View>
+        )}
 
         {/* Astrologers List */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Choose Your Astrologer</Text>
-          <View style={styles.astrologersList}>
-            {astrologers.map((astrologer) => (
-              <View key={astrologer.id} style={styles.astrologerCard}>
-                <View style={styles.astrologerHeader}>
-                  <View style={styles.astrologerImageContainer}>
-                    <Image
-                      source={{ uri: astrologer.image }}
-                      style={styles.astrologerImage}
-                    />
-                    <View style={[
-                      styles.statusDot,
-                      astrologer.status === 'online' ? styles.onlineStatus : styles.busyStatus
-                    ]} />
-                  </View>
-                  <View style={styles.astrologerInfo}>
-                    <Text style={styles.astrologerName}>{astrologer.name}</Text>
-                    <Text style={styles.astrologerSpecialty}>{astrologer.specialty}</Text>
-                    <Text style={styles.astrologerExperience}>{astrologer.experience}</Text>
-                    <View style={styles.ratingContainer}>
-                      <Star color="#F59E0B" size={14} fill="#F59E0B" />
-                      <Text style={styles.rating}>
-                        {astrologer.rating} ({astrologer.reviews})
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Loading astrologers...</Text>
+            </View>
+          ) : (
+            <View style={styles.astrologersList}>
+              {astrologers.map((astrologer) => (
+                <View key={astrologer.id} style={styles.astrologerCard}>
+                  <View style={styles.astrologerHeader}>
+                    <View style={styles.astrologerImageContainer}>
+                      <Image
+                        source={{ uri: astrologer.image_url }}
+                        style={styles.astrologerImage}
+                      />
+                      <View style={[
+                        styles.statusDot,
+                        astrologer.is_online ? styles.onlineStatus : styles.busyStatus
+                      ]} />
+                    </View>
+                    <View style={styles.astrologerInfo}>
+                      <Text style={styles.astrologerName}>{astrologer.name}</Text>
+                      <Text style={styles.astrologerSpecialty}>
+                        {astrologer.specialties.join(', ')}
                       </Text>
-                    </View>
-                    <View style={styles.languagesContainer}>
-                      {astrologer.languages.map((lang, index) => (
-                        <Text key={index} style={styles.languageTag}>
-                          {lang}
+                      <Text style={styles.astrologerExperience}>
+                        {astrologer.experience_years}+ years experience
+                      </Text>
+                      <View style={styles.ratingContainer}>
+                        <Star color="#F59E0B" size={14} fill="#F59E0B" />
+                        <Text style={styles.rating}>
+                          {astrologer.rating} ({astrologer.total_reviews})
                         </Text>
-                      ))}
+                      </View>
+                      <View style={styles.languagesContainer}>
+                        {astrologer.languages.map((lang, index) => (
+                          <Text key={index} style={styles.languageTag}>
+                            {lang}
+                          </Text>
+                        ))}
+                      </View>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.astrologerActions}>
+                    <View style={styles.rateContainer}>
+                      <IndianRupee color="#10B981" size={16} />
+                      <Text style={styles.rateText}>{astrologer.rate_per_minute}/min</Text>
+                    </View>
+                    <View style={styles.actionButtons}>
+                      <TouchableOpacity 
+                        style={styles.actionButton}
+                        onPress={() => handleStartConsultation(astrologer, 'chat')}>
+                        <MessageCircle color="#F97316" size={18} />
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={styles.actionButton}
+                        onPress={() => handleStartConsultation(astrologer, 'call')}>
+                        <Phone color="#10B981" size={18} />
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={styles.actionButton}
+                        onPress={() => handleStartConsultation(astrologer, 'video')}>
+                        <Video color="#8B5CF6" size={18} />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
-                
-                <View style={styles.astrologerActions}>
-                  <View style={styles.rateContainer}>
-                    <IndianRupee color="#10B981" size={16} />
-                    <Text style={styles.rateText}>{astrologer.rate}/min</Text>
-                  </View>
-                  <View style={styles.actionButtons}>
-                    <TouchableOpacity style={styles.actionButton}>
-                      <MessageCircle color="#F97316" size={18} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
-                      <Phone color="#10B981" size={18} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton}>
-                      <Video color="#8B5CF6" size={18} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Quick Consultation */}
@@ -420,6 +497,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-SemiBold',
     color: '#F97316',
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
   },
   astrologersList: {
     gap: 16,
