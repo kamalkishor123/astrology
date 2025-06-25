@@ -41,6 +41,7 @@ export default function ConsultationsScreen() {
 
   const fetchAstrologers = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('astrologers')
         .select('*')
@@ -50,8 +51,11 @@ export default function ConsultationsScreen() {
         console.error('Error fetching astrologers:', error);
         // Use fallback data if database fails
         setAstrologers(getFallbackAstrologers());
+      } else if (data && data.length > 0) {
+        setAstrologers(data);
       } else {
-        setAstrologers(data || getFallbackAstrologers());
+        // If no data from database, use fallback
+        setAstrologers(getFallbackAstrologers());
       }
     } catch (error) {
       console.error('Error:', error);
@@ -63,7 +67,7 @@ export default function ConsultationsScreen() {
 
   const getFallbackAstrologers = (): Astrologer[] => [
     {
-      id: '1',
+      id: '660e8400-e29b-41d4-a716-446655440001',
       name: 'Pandit Rajesh Sharma',
       image_url: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
       specialties: ['Vedic Astrology', 'Kundli Analysis'],
@@ -77,7 +81,7 @@ export default function ConsultationsScreen() {
       bio: 'Expert in Vedic astrology with over 15 years of experience.'
     },
     {
-      id: '2',
+      id: '660e8400-e29b-41d4-a716-446655440002',
       name: 'Dr. Priya Gupta',
       image_url: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
       specialties: ['Numerology', 'Tarot Reading'],
@@ -91,7 +95,7 @@ export default function ConsultationsScreen() {
       bio: 'Renowned numerologist and tarot reader.'
     },
     {
-      id: '3',
+      id: '660e8400-e29b-41d4-a716-446655440003',
       name: 'Acharya Vikram Singh',
       image_url: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
       specialties: ['Palmistry', 'Face Reading'],
@@ -105,7 +109,7 @@ export default function ConsultationsScreen() {
       bio: 'Master palmist with expertise in face reading.'
     },
     {
-      id: '4',
+      id: '660e8400-e29b-41d4-a716-446655440004',
       name: 'Guru Meera Devi',
       image_url: 'https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
       specialties: ['Relationship Counseling', 'Career Guidance'],
@@ -117,12 +121,50 @@ export default function ConsultationsScreen() {
       is_online: true,
       is_verified: true,
       bio: 'Spiritual healer and relationship counselor.'
+    },
+    {
+      id: '660e8400-e29b-41d4-a716-446655440005',
+      name: 'Pandit Suresh Kumar',
+      image_url: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      specialties: ['Vedic Astrology', 'Gemstone Consultation'],
+      experience_years: 25,
+      rating: 4.9,
+      total_reviews: 4500,
+      languages: ['Hindi', 'English', 'Sanskrit'],
+      rate_per_minute: 45,
+      is_online: true,
+      is_verified: true,
+      bio: 'Senior Vedic astrologer with expertise in gemstone recommendations.'
+    },
+    {
+      id: '660e8400-e29b-41d4-a716-446655440006',
+      name: 'Astrologer Kavita Sharma',
+      image_url: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
+      specialties: ['Love & Marriage', 'Family Problems'],
+      experience_years: 10,
+      rating: 4.5,
+      total_reviews: 1200,
+      languages: ['Hindi', 'English'],
+      rate_per_minute: 30,
+      is_online: true,
+      is_verified: true,
+      bio: 'Specializes in relationship and family matters.'
     }
   ];
 
   const handleStartConsultation = (astrologer: Astrologer, type: 'chat' | 'call' | 'video') => {
-    router.push(`/chat/${astrologer.id}?type=${type}&name=${encodeURIComponent(astrologer.name)}`);
+    router.push(`/chat/${astrologer.id}?type=${type}&name=${encodeURIComponent(astrologer.name)}&rate=${astrologer.rate_per_minute}`);
   };
+
+  const filteredAstrologers = astrologers.filter(astrologer => {
+    if (searchQuery) {
+      return astrologer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+             astrologer.specialties.some(specialty => 
+               specialty.toLowerCase().includes(searchQuery.toLowerCase())
+             );
+    }
+    return true;
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -197,28 +239,28 @@ export default function ConsultationsScreen() {
         </View>
 
         {/* Featured Astrologer */}
-        {astrologers.length > 0 && (
+        {filteredAstrologers.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Featured Astrologer</Text>
             <LinearGradient
               colors={['#F97316', '#FB923C']}
               style={styles.featuredCard}>
               <Image
-                source={{ uri: astrologers[0].image_url }}
+                source={{ uri: filteredAstrologers[0].image_url }}
                 style={styles.featuredImage}
               />
               <View style={styles.featuredInfo}>
-                <Text style={styles.featuredName}>{astrologers[0].name}</Text>
-                <Text style={styles.featuredSpecialty}>{astrologers[0].specialties.join(', ')}</Text>
+                <Text style={styles.featuredName}>{filteredAstrologers[0].name}</Text>
+                <Text style={styles.featuredSpecialty}>{filteredAstrologers[0].specialties.join(', ')}</Text>
                 <View style={styles.featuredRating}>
                   <Star color="#FFFFFF" size={16} fill="#FFFFFF" />
                   <Text style={styles.featuredRatingText}>
-                    {astrologers[0].rating} ({astrologers[0].total_reviews} reviews)
+                    {filteredAstrologers[0].rating} ({filteredAstrologers[0].total_reviews} reviews)
                   </Text>
                 </View>
                 <TouchableOpacity 
                   style={styles.featuredButton}
-                  onPress={() => handleStartConsultation(astrologers[0], 'chat')}>
+                  onPress={() => handleStartConsultation(filteredAstrologers[0], 'chat')}>
                   <Text style={styles.featuredButtonText}>Chat Now</Text>
                 </TouchableOpacity>
               </View>
@@ -228,14 +270,18 @@ export default function ConsultationsScreen() {
 
         {/* Astrologers List */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Choose Your Astrologer</Text>
+          <Text style={styles.sectionTitle}>Choose Your Astrologer ({filteredAstrologers.length})</Text>
           {loading ? (
             <View style={styles.loadingContainer}>
               <Text style={styles.loadingText}>Loading astrologers...</Text>
             </View>
+          ) : filteredAstrologers.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No astrologers found</Text>
+            </View>
           ) : (
             <View style={styles.astrologersList}>
-              {astrologers.map((astrologer) => (
+              {filteredAstrologers.map((astrologer) => (
                 <View key={astrologer.id} style={styles.astrologerCard}>
                   <View style={styles.astrologerHeader}>
                     <View style={styles.astrologerImageContainer}>
@@ -279,19 +325,19 @@ export default function ConsultationsScreen() {
                     </View>
                     <View style={styles.actionButtons}>
                       <TouchableOpacity 
-                        style={styles.actionButton}
+                        style={[styles.actionButton, styles.chatButton]}
                         onPress={() => handleStartConsultation(astrologer, 'chat')}>
-                        <MessageCircle color="#F97316" size={18} />
+                        <MessageCircle color="#FFFFFF" size={18} />
                       </TouchableOpacity>
                       <TouchableOpacity 
-                        style={styles.actionButton}
+                        style={[styles.actionButton, styles.callButton]}
                         onPress={() => handleStartConsultation(astrologer, 'call')}>
-                        <Phone color="#10B981" size={18} />
+                        <Phone color="#FFFFFF" size={18} />
                       </TouchableOpacity>
                       <TouchableOpacity 
-                        style={styles.actionButton}
+                        style={[styles.actionButton, styles.videoButton]}
                         onPress={() => handleStartConsultation(astrologer, 'video')}>
-                        <Video color="#8B5CF6" size={18} />
+                        <Video color="#FFFFFF" size={18} />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -507,6 +553,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     color: '#6B7280',
   },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+  },
   astrologersList: {
     gap: 16,
   },
@@ -617,9 +672,17 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  chatButton: {
+    backgroundColor: '#F97316',
+  },
+  callButton: {
+    backgroundColor: '#10B981',
+  },
+  videoButton: {
+    backgroundColor: '#8B5CF6',
   },
   quickConsultCard: {
     borderRadius: 16,

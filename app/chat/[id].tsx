@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Send, Phone, Video, MoveVertical as MoreVertical, Clock, Star } from 'lucide-react-native';
+import { ArrowLeft, Send, Phone, Video, MoreVertical, Clock, Star, IndianRupee, Smile } from 'lucide-react-native';
 import { useState, useEffect, useRef } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -13,25 +13,30 @@ interface Message {
   type?: 'text' | 'system';
 }
 
+const quickQuestions = [
+  "What does my future hold?",
+  "When will I find love?",
+  "Career guidance needed",
+  "Health concerns",
+  "Financial advice",
+  "Family problems"
+];
+
 export default function ChatScreen() {
-  const { id, type, name } = useLocalSearchParams();
+  const { id, type, name, rate } = useLocalSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [sessionTime, setSessionTime] = useState(0);
   const [isActive, setIsActive] = useState(false);
+  const [showQuickQuestions, setShowQuickQuestions] = useState(true);
+  const [totalCost, setTotalCost] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
+
+  const ratePerMinute = parseFloat(rate as string) || 35;
 
   useEffect(() => {
     // Initialize chat with welcome message
-    const welcomeMessage: Message = {
-      id: '1',
-      text: `Hello! I'm ${name || 'your astrologer'}. Welcome to our consultation session. How can I help you today?`,
-      sender: 'astrologer',
-      timestamp: new Date(),
-      type: 'text'
-    };
-
     const systemMessage: Message = {
       id: '0',
       text: `${type === 'chat' ? 'Chat' : type === 'call' ? 'Voice Call' : 'Video Call'} session started`,
@@ -40,23 +45,36 @@ export default function ChatScreen() {
       type: 'system'
     };
 
+    const welcomeMessage: Message = {
+      id: '1',
+      text: `🙏 Namaste! I'm ${name || 'your astrologer'}. Welcome to our consultation session. I'm here to guide you with ancient wisdom and cosmic insights. How can I help you today?`,
+      sender: 'astrologer',
+      timestamp: new Date(),
+      type: 'text'
+    };
+
     setMessages([systemMessage, welcomeMessage]);
     setIsActive(true);
 
     // Start session timer
     const timer = setInterval(() => {
-      setSessionTime(prev => prev + 1);
+      setSessionTime(prev => {
+        const newTime = prev + 1;
+        setTotalCost((newTime / 60) * ratePerMinute);
+        return newTime;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [id, type, name]);
+  }, [id, type, name, ratePerMinute]);
 
-  const sendMessage = () => {
-    if (!inputText.trim()) return;
+  const sendMessage = (messageText?: string) => {
+    const textToSend = messageText || inputText.trim();
+    if (!textToSend) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputText.trim(),
+      text: textToSend,
       sender: 'user',
       timestamp: new Date(),
       type: 'text'
@@ -65,20 +83,14 @@ export default function ChatScreen() {
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsTyping(true);
+    setShowQuickQuestions(false);
 
     // Simulate astrologer response
     setTimeout(() => {
-      const responses = [
-        "Thank you for sharing that with me. Based on your birth details, I can see some interesting planetary influences.",
-        "That's a very insightful question. Let me analyze your chart and provide you with guidance.",
-        "I understand your concern. The current planetary transit suggests some changes ahead.",
-        "Your question relates to an important aspect of your life. Let me explain what the stars reveal.",
-        "This is a common concern I see in many charts. Here's what I recommend based on your planetary positions."
-      ];
-
+      const responses = getContextualResponse(textToSend);
       const astrologerMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: responses,
         sender: 'astrologer',
         timestamp: new Date(),
         type: 'text'
@@ -86,12 +98,51 @@ export default function ChatScreen() {
 
       setMessages(prev => [...prev, astrologerMessage]);
       setIsTyping(false);
-    }, 2000);
+    }, 2000 + Math.random() * 2000);
 
     // Auto-scroll to bottom
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
+  };
+
+  const getContextualResponse = (userMessage: string): string => {
+    const lowerMessage = userMessage.toLowerCase();
+    
+    if (lowerMessage.includes('love') || lowerMessage.includes('relationship') || lowerMessage.includes('marriage')) {
+      return "💕 I can see Venus is strongly positioned in your chart. Your love life is about to take a beautiful turn. The cosmic energies suggest that someone special will enter your life within the next 3-6 months. Focus on self-love first, and the universe will bring the right person to you.";
+    }
+    
+    if (lowerMessage.includes('career') || lowerMessage.includes('job') || lowerMessage.includes('work')) {
+      return "🌟 Your career sector shows tremendous potential! Jupiter's influence indicates a promotion or new opportunity coming your way. The period between next month and 3 months ahead is particularly auspicious for career growth. Stay confident and take calculated risks.";
+    }
+    
+    if (lowerMessage.includes('health') || lowerMessage.includes('illness') || lowerMessage.includes('disease')) {
+      return "🌿 Your health chart shows some minor concerns that can be easily addressed. I recommend wearing a moonstone and chanting the Mahamrityunjaya mantra daily. Avoid spicy foods for the next 21 days and drink more water. Your vitality will improve significantly.";
+    }
+    
+    if (lowerMessage.includes('money') || lowerMessage.includes('financial') || lowerMessage.includes('wealth')) {
+      return "💰 The financial sector of your chart is quite promising! I see multiple income sources opening up. Invest in property or gold during the next auspicious period. Avoid lending money to friends for the next 2 months. Lakshmi's blessings are upon you.";
+    }
+    
+    if (lowerMessage.includes('family') || lowerMessage.includes('parents') || lowerMessage.includes('children')) {
+      return "👨‍👩‍👧‍👦 Family harmony is indicated in your chart, though there might be some temporary misunderstandings. Perform a small puja at home and donate food to the needy. The family bonds will strengthen, and any disputes will resolve naturally within 40 days.";
+    }
+    
+    if (lowerMessage.includes('future') || lowerMessage.includes('destiny') || lowerMessage.includes('fate')) {
+      return "🔮 Your destiny is written in the stars, and it's quite remarkable! The next 2 years will be transformative. You're entering a period of spiritual growth and material success. Trust your intuition, as your inner wisdom is particularly strong right now.";
+    }
+    
+    // Default responses
+    const defaultResponses = [
+      "🌟 Based on your planetary positions, I can see that you're going through a significant phase of transformation. The cosmic energies are aligning to bring positive changes in your life.",
+      "✨ Your birth chart reveals some interesting patterns. The current planetary transit suggests that this is an auspicious time for new beginnings and important decisions.",
+      "🔮 I sense strong spiritual energy around you. The universe is trying to communicate something important. Let me analyze your chart deeper to provide more specific guidance.",
+      "🌙 The Moon's position in your chart indicates emotional sensitivity and intuitive powers. You have a natural ability to understand others' feelings and should trust your instincts more.",
+      "☀️ The Sun's influence in your chart shows leadership qualities and a bright future ahead. However, you need to be patient as good things take time to manifest."
+    ];
+    
+    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
   };
 
   const formatTime = (seconds: number) => {
@@ -101,7 +152,24 @@ export default function ChatScreen() {
   };
 
   const endSession = () => {
-    router.back();
+    Alert.alert(
+      'End Session',
+      `Your consultation lasted ${formatTime(sessionTime)} and cost ₹${totalCost.toFixed(2)}. Are you sure you want to end the session?`,
+      [
+        { text: 'Continue', style: 'cancel' },
+        { 
+          text: 'End Session', 
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Session Ended',
+              'Thank you for your consultation! Please rate your experience.',
+              [{ text: 'OK', onPress: () => router.back() }]
+            );
+          }
+        }
+      ]
+    );
   };
 
   const renderMessage = (message: Message) => {
@@ -182,11 +250,15 @@ export default function ChatScreen() {
             <Text style={styles.sessionStatusText}>
               {type === 'chat' ? 'Chat Session Active' : 
                type === 'call' ? 'Voice Call Active' : 
-               'Video Call Active'} • ₹35/min
+               'Video Call Active'} • ₹{ratePerMinute}/min
             </Text>
           </View>
+          <View style={styles.costContainer}>
+            <IndianRupee color="#10B981" size={14} />
+            <Text style={styles.costText}>₹{totalCost.toFixed(2)}</Text>
+          </View>
           <TouchableOpacity style={styles.endSessionButton} onPress={endSession}>
-            <Text style={styles.endSessionText}>End Session</Text>
+            <Text style={styles.endSessionText}>End</Text>
           </TouchableOpacity>
         </View>
 
@@ -206,6 +278,24 @@ export default function ChatScreen() {
                   <View style={[styles.typingDot, styles.typingDot2]} />
                   <View style={[styles.typingDot, styles.typingDot3]} />
                 </View>
+                <Text style={styles.typingText}>Astrologer is typing...</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Quick Questions */}
+          {showQuickQuestions && messages.length <= 2 && (
+            <View style={styles.quickQuestionsContainer}>
+              <Text style={styles.quickQuestionsTitle}>Quick Questions:</Text>
+              <View style={styles.quickQuestionsList}>
+                {quickQuestions.map((question, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.quickQuestionButton}
+                    onPress={() => sendMessage(question)}>
+                    <Text style={styles.quickQuestionText}>{question}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
           )}
@@ -214,6 +304,9 @@ export default function ChatScreen() {
         {/* Input */}
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
+            <TouchableOpacity style={styles.emojiButton}>
+              <Smile color="#9CA3AF" size={20} />
+            </TouchableOpacity>
             <TextInput
               style={styles.textInput}
               placeholder="Type your message..."
@@ -224,7 +317,7 @@ export default function ChatScreen() {
             />
             <TouchableOpacity 
               style={[styles.sendButton, inputText.trim() ? styles.sendButtonActive : null]}
-              onPress={sendMessage}
+              onPress={() => sendMessage()}
               disabled={!inputText.trim()}>
               <Send color={inputText.trim() ? "#FFFFFF" : "#9CA3AF"} size={20} />
             </TouchableOpacity>
@@ -317,12 +410,24 @@ const styles = StyleSheet.create({
   sessionStatusContent: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   sessionStatusText: {
     fontSize: 14,
     fontFamily: 'Inter-Medium',
     color: '#92400E',
     marginLeft: 8,
+  },
+  costContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  costText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#10B981',
+    marginLeft: 2,
   },
   endSessionButton: {
     backgroundColor: '#EF4444',
@@ -425,6 +530,7 @@ const styles = StyleSheet.create({
   typingDots: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 4,
   },
   typingDot: {
     width: 6,
@@ -433,14 +539,44 @@ const styles = StyleSheet.create({
     backgroundColor: '#9CA3AF',
     marginHorizontal: 2,
   },
-  typingDot1: {
-    // Animation would be added here in a real implementation
+  typingDot1: {},
+  typingDot2: {},
+  typingDot3: {},
+  typingText: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    fontStyle: 'italic',
   },
-  typingDot2: {
-    // Animation would be added here in a real implementation
+  quickQuestionsContainer: {
+    marginTop: 20,
+    marginBottom: 16,
   },
-  typingDot3: {
-    // Animation would be added here in a real implementation
+  quickQuestionsTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#1F2937',
+    marginBottom: 12,
+  },
+  quickQuestionsList: {
+    gap: 8,
+  },
+  quickQuestionButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  quickQuestionText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#374151',
   },
   inputContainer: {
     paddingHorizontal: 20,
@@ -457,6 +593,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
+  emojiButton: {
+    padding: 8,
+  },
   textInput: {
     flex: 1,
     fontSize: 16,
@@ -464,6 +603,7 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     maxHeight: 100,
     paddingVertical: 8,
+    marginHorizontal: 8,
   },
   sendButton: {
     width: 36,
@@ -472,7 +612,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
   },
   sendButtonActive: {
     backgroundColor: '#F97316',
