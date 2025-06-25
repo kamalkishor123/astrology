@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Send, Phone, Video, MoreVertical, Clock, Star, IndianRupee, Smile } from 'lucide-react-native';
+import { ArrowLeft, Send, Phone, Video, MoveVertical as MoreVertical, Clock, Star, IndianRupee, Smile } from 'lucide-react-native';
 import { useState, useEffect, useRef } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 
