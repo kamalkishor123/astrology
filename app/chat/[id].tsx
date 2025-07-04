@@ -172,6 +172,14 @@ export default function ChatScreen() {
     );
   };
 
+  const startVoiceCall = () => {
+    router.push(`/call/${id}?name=${encodeURIComponent(name as string)}&rate=${rate}&type=call`);
+  };
+
+  const startVideoCall = () => {
+    router.push(`/video/${id}?name=${encodeURIComponent(name as string)}&rate=${rate}&type=video`);
+  };
+
   const renderMessage = (message: Message) => {
     if (message.type === 'system') {
       return (
@@ -227,16 +235,12 @@ export default function ChatScreen() {
           </View>
 
           <View style={styles.headerActions}>
-            {type !== 'chat' && (
-              <>
-                <TouchableOpacity style={styles.headerButton}>
-                  <Phone color="#FFFFFF" size={20} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.headerButton}>
-                  <Video color="#FFFFFF" size={20} />
-                </TouchableOpacity>
-              </>
-            )}
+            <TouchableOpacity style={styles.headerButton} onPress={startVoiceCall}>
+              <Phone color="#FFFFFF" size={20} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.headerButton} onPress={startVideoCall}>
+              <Video color="#FFFFFF" size={20} />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.headerButton}>
               <MoreVertical color="#FFFFFF" size={20} />
             </TouchableOpacity>
@@ -248,9 +252,7 @@ export default function ChatScreen() {
           <View style={styles.sessionStatusContent}>
             <Star color="#F59E0B" size={16} fill="#F59E0B" />
             <Text style={styles.sessionStatusText}>
-              {type === 'chat' ? 'Chat Session Active' : 
-               type === 'call' ? 'Voice Call Active' : 
-               'Video Call Active'} • ₹{ratePerMinute}/min
+              Chat Session Active • ₹{ratePerMinute}/min
             </Text>
           </View>
           <View style={styles.costContainer}>
