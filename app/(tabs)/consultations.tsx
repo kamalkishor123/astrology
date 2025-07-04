@@ -42,23 +42,31 @@ export default function ConsultationsScreen() {
   const fetchAstrologers = async () => {
     try {
       setLoading(true);
+      
+      // Check if Supabase is properly configured
+      if (!process.env.EXPO_PUBLIC_SUPABASE_URL || !process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) {
+        console.warn('Supabase environment variables not configured, using fallback data');
+        setAstrologers(getFallbackAstrologers());
+        return;
+      }
+
       const { data, error } = await supabase
         .from('astrologers')
         .select('*')
         .order('rating', { ascending: false });
 
       if (error) {
-        console.error('Error fetching astrologers:', error);
-        // Use fallback data if database fails
+        console.warn('Supabase error, using fallback data:', error.message);
         setAstrologers(getFallbackAstrologers());
       } else if (data && data.length > 0) {
         setAstrologers(data);
       } else {
         // If no data from database, use fallback
+        console.info('No astrologers found in database, using fallback data');
         setAstrologers(getFallbackAstrologers());
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.warn('Network error, using fallback data:', error);
       setAstrologers(getFallbackAstrologers());
     } finally {
       setLoading(false);
