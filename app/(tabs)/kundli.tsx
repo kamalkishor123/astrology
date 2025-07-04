@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Star, MapPin, Clock, Calendar, User, Download, Share2, Heart } from 'lucide-react-native';
+import { Star, MapPin, Clock, Calendar, User, Download, Share2, Heart, Users } from 'lucide-react-native';
 import { useState } from 'react';
+import { router } from 'expo-router';
 
 const planetaryPositions = [
   { planet: 'Sun', sign: 'Leo', degree: '15°32\'', house: '1st', strength: 'Strong' },
@@ -34,6 +35,27 @@ export default function KundliScreen() {
           <Text style={styles.headerTitle}>Birth Chart (Kundli)</Text>
           <Text style={styles.headerSubtitle}>Complete Vedic Analysis</Text>
         </LinearGradient>
+
+        {/* Quick Actions */}
+        <View style={styles.section}>
+          <View style={styles.quickActionsContainer}>
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => router.push('/(tabs)/kundli')}>
+              <User color="#1E3A8A" size={32} />
+              <Text style={styles.quickActionTitle}>My Kundli</Text>
+              <Text style={styles.quickActionSubtitle}>View your birth chart</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.quickActionCard}
+              onPress={() => router.push('/kundli-check')}>
+              <Users color="#F97316" size={32} />
+              <Text style={styles.quickActionTitle}>Check Others</Text>
+              <Text style={styles.quickActionSubtitle}>Generate any kundli</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Birth Details Card */}
         <View style={styles.section}>
@@ -186,7 +208,9 @@ export default function KundliScreen() {
               <Text style={styles.compatibilitySubtitle}>
                 Check compatibility with your partner based on Guna Milan
               </Text>
-              <TouchableOpacity style={styles.compatibilityButton}>
+              <TouchableOpacity 
+                style={styles.compatibilityButton}
+                onPress={() => router.push('/love-match')}>
                 <Text style={styles.compatibilityButtonText}>Check Match</Text>
               </TouchableOpacity>
             </View>
@@ -244,6 +268,35 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
     color: '#1F2937',
     marginBottom: 16,
+  },
+  quickActionsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  quickActionCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  quickActionTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: '#1F2937',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+  quickActionSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
+    textAlign: 'center',
   },
   birthDetailsCard: {
     backgroundColor: '#FFFFFF',
