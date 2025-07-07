@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MessageCircle, Phone, Video, Star, Search, Filter, Clock, IndianRupee } from 'lucide-react-native';
@@ -21,16 +21,7 @@ interface Astrologer {
   bio?: string;
 }
 
-const categories = [
-  { name: 'All', active: true },
-  { name: 'Love & Marriage', active: false },
-  { name: 'Career', active: false },
-  { name: 'Health', active: false },
-  { name: 'Finance', active: false }
-];
-
 export default function ConsultationsScreen() {
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [astrologers, setAstrologers] = useState<Astrologer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +52,6 @@ export default function ConsultationsScreen() {
       } else if (data && data.length > 0) {
         setAstrologers(data);
       } else {
-        // If no data from database, use fallback
         console.info('No astrologers found in database, using fallback data');
         setAstrologers(getFallbackAstrologers());
       }
@@ -75,7 +65,7 @@ export default function ConsultationsScreen() {
 
   const getFallbackAstrologers = (): Astrologer[] => [
     {
-      id: '660e8400-e29b-41d4-a716-446655440001',
+      id: '1',
       name: 'Pandit Rajesh Sharma',
       image_url: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
       specialties: ['Vedic Astrology', 'Kundli Analysis'],
@@ -89,7 +79,7 @@ export default function ConsultationsScreen() {
       bio: 'Expert in Vedic astrology with over 15 years of experience.'
     },
     {
-      id: '660e8400-e29b-41d4-a716-446655440002',
+      id: '2',
       name: 'Dr. Priya Gupta',
       image_url: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
       specialties: ['Numerology', 'Tarot Reading'],
@@ -103,7 +93,7 @@ export default function ConsultationsScreen() {
       bio: 'Renowned numerologist and tarot reader.'
     },
     {
-      id: '660e8400-e29b-41d4-a716-446655440003',
+      id: '3',
       name: 'Acharya Vikram Singh',
       image_url: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
       specialties: ['Palmistry', 'Face Reading'],
@@ -115,53 +105,18 @@ export default function ConsultationsScreen() {
       is_online: false,
       is_verified: true,
       bio: 'Master palmist with expertise in face reading.'
-    },
-    {
-      id: '660e8400-e29b-41d4-a716-446655440004',
-      name: 'Guru Meera Devi',
-      image_url: 'https://images.pexels.com/photos/762020/pexels-photo-762020.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
-      specialties: ['Relationship Counseling', 'Career Guidance'],
-      experience_years: 18,
-      rating: 4.6,
-      total_reviews: 2156,
-      languages: ['Hindi', 'English', 'Bengali'],
-      rate_per_minute: 38,
-      is_online: true,
-      is_verified: true,
-      bio: 'Spiritual healer and relationship counselor.'
-    },
-    {
-      id: '660e8400-e29b-41d4-a716-446655440005',
-      name: 'Pandit Suresh Kumar',
-      image_url: 'https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
-      specialties: ['Vedic Astrology', 'Gemstone Consultation'],
-      experience_years: 25,
-      rating: 4.9,
-      total_reviews: 4500,
-      languages: ['Hindi', 'English', 'Sanskrit'],
-      rate_per_minute: 45,
-      is_online: true,
-      is_verified: true,
-      bio: 'Senior Vedic astrologer with expertise in gemstone recommendations.'
-    },
-    {
-      id: '660e8400-e29b-41d4-a716-446655440006',
-      name: 'Astrologer Kavita Sharma',
-      image_url: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&dpr=2',
-      specialties: ['Love & Marriage', 'Family Problems'],
-      experience_years: 10,
-      rating: 4.5,
-      total_reviews: 1200,
-      languages: ['Hindi', 'English'],
-      rate_per_minute: 30,
-      is_online: true,
-      is_verified: true,
-      bio: 'Specializes in relationship and family matters.'
     }
   ];
 
   const handleStartConsultation = (astrologer: Astrologer, type: 'chat' | 'call' | 'video') => {
-    router.push(`/chat/${astrologer.id}?type=${type}&name=${encodeURIComponent(astrologer.name)}&rate=${astrologer.rate_per_minute}`);
+    Alert.alert(
+      'Start Consultation',
+      `Would you like to start a ${type} consultation with ${astrologer.name}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Start', onPress: () => console.log(`Starting ${type} with ${astrologer.name}`) }
+      ]
+    );
   };
 
   const filteredAstrologers = astrologers.filter(astrologer => {
@@ -185,7 +140,7 @@ export default function ConsultationsScreen() {
           <Text style={styles.headerSubtitle}>Connect with Expert Astrologers</Text>
         </LinearGradient>
 
-        {/* Search and Filter */}
+        {/* Search */}
         <View style={styles.section}>
           <View style={styles.searchContainer}>
             <View style={styles.searchBar}>
@@ -202,79 +157,6 @@ export default function ConsultationsScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Categories */}
-        <View style={styles.section}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.categoriesContainer}>
-              {categories.map((category, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.categoryChip,
-                    selectedCategory === category.name && styles.activeCategoryChip
-                  ]}
-                  onPress={() => setSelectedCategory(category.name)}>
-                  <Text
-                    style={[
-                      styles.categoryText,
-                      selectedCategory === category.name && styles.activeCategoryText
-                    ]}>
-                    {category.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-
-        {/* Quick Stats */}
-        <View style={styles.section}>
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>500+</Text>
-              <Text style={styles.statLabel}>Expert Astrologers</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>24/7</Text>
-              <Text style={styles.statLabel}>Available</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>50K+</Text>
-              <Text style={styles.statLabel}>Happy Clients</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Featured Astrologer */}
-        {filteredAstrologers.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Featured Astrologer</Text>
-            <LinearGradient
-              colors={['#F97316', '#FB923C']}
-              style={styles.featuredCard}>
-              <Image
-                source={{ uri: filteredAstrologers[0].image_url }}
-                style={styles.featuredImage}
-              />
-              <View style={styles.featuredInfo}>
-                <Text style={styles.featuredName}>{filteredAstrologers[0].name}</Text>
-                <Text style={styles.featuredSpecialty}>{filteredAstrologers[0].specialties.join(', ')}</Text>
-                <View style={styles.featuredRating}>
-                  <Star color="#FFFFFF" size={16} fill="#FFFFFF" />
-                  <Text style={styles.featuredRatingText}>
-                    {filteredAstrologers[0].rating} ({filteredAstrologers[0].total_reviews} reviews)
-                  </Text>
-                </View>
-                <TouchableOpacity 
-                  style={styles.featuredButton}
-                  onPress={() => handleStartConsultation(filteredAstrologers[0], 'chat')}>
-                  <Text style={styles.featuredButtonText}>Chat Now</Text>
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
-          </View>
-        )}
 
         {/* Astrologers List */}
         <View style={styles.section}>
@@ -354,24 +236,6 @@ export default function ConsultationsScreen() {
             </View>
           )}
         </View>
-
-        {/* Quick Consultation */}
-        <View style={styles.section}>
-          <LinearGradient
-            colors={['#8B5CF6', '#A78BFA']}
-            style={styles.quickConsultCard}>
-            <Clock color="#FFFFFF" size={32} />
-            <View style={styles.quickConsultContent}>
-              <Text style={styles.quickConsultTitle}>Quick 5-Min Reading</Text>
-              <Text style={styles.quickConsultSubtitle}>
-                Get instant answers to your questions with AI-powered insights
-              </Text>
-              <TouchableOpacity style={styles.quickConsultButton}>
-                <Text style={styles.quickConsultButtonText}>Start Now - ₹99</Text>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -399,8 +263,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   section: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    padding: 20,
   },
   sectionTitle: {
     fontSize: 20,
@@ -443,114 +306,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
-  categoriesContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingRight: 20,
-  },
-  categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  activeCategoryChip: {
-    backgroundColor: '#F97316',
-    borderColor: '#F97316',
-  },
-  categoryText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#6B7280',
-  },
-  activeCategoryText: {
-    color: '#FFFFFF',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  statCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    flex: 1,
-    marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statNumber: {
-    fontSize: 24,
-    fontFamily: 'Poppins-Bold',
-    color: '#1E3A8A',
-  },
-  statLabel: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    color: '#6B7280',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  featuredCard: {
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  featuredImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
-  },
-  featuredInfo: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  featuredName: {
-    fontSize: 18,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#FFFFFF',
-  },
-  featuredSpecialty: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#FFFFFF',
-    opacity: 0.9,
-    marginTop: 2,
-  },
-  featuredRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  featuredRatingText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Medium',
-    color: '#FFFFFF',
-    marginLeft: 4,
-    opacity: 0.9,
-  },
-  featuredButton: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    marginTop: 12,
-    alignSelf: 'flex-start',
-  },
-  featuredButtonText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#F97316',
   },
   loadingContainer: {
     padding: 40,
@@ -691,40 +446,5 @@ const styles = StyleSheet.create({
   },
   videoButton: {
     backgroundColor: '#8B5CF6',
-  },
-  quickConsultCard: {
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  quickConsultContent: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  quickConsultTitle: {
-    fontSize: 18,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#FFFFFF',
-  },
-  quickConsultSubtitle: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#FFFFFF',
-    marginTop: 4,
-    opacity: 0.9,
-  },
-  quickConsultButton: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginTop: 12,
-    alignSelf: 'flex-start',
-  },
-  quickConsultButtonText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#8B5CF6',
   },
 });

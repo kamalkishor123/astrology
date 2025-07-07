@@ -1,17 +1,8 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Bell, Sparkles, Star, Heart, Briefcase, Shield, Gift } from 'lucide-react-native';
+import { Bell, Sparkles, Star, Heart, Briefcase, Shield } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-
-const zodiacSigns = [
-  { name: 'Aries', symbol: '♈', color: '#FF6B6B' },
-  { name: 'Taurus', symbol: '♉', color: '#4ECDC4' },
-  { name: 'Gemini', symbol: '♊', color: '#45B7D1' },
-  { name: 'Cancer', symbol: '♋', color: '#96CEB4' },
-  { name: 'Leo', symbol: '♌', color: '#FFEAA7' },
-  { name: 'Virgo', symbol: '♍', color: '#DDA0DD' },
-];
 
 const quickServices = [
   { 
@@ -19,28 +10,24 @@ const quickServices = [
     title: 'Daily Horoscope', 
     subtitle: 'Your daily guidance', 
     color: '#F59E0B',
-    route: '/daily-horoscope'
   },
   { 
     icon: Heart, 
     title: 'Love Match', 
     subtitle: 'Find compatibility', 
     color: '#EF4444',
-    route: '/love-match'
   },
   { 
     icon: Briefcase, 
     title: 'Career Guide', 
     subtitle: 'Professional insights', 
     color: '#10B981',
-    route: '/career-guide'
   },
   { 
     icon: Shield, 
     title: 'Remedies', 
     subtitle: 'Spiritual solutions', 
     color: '#8B5CF6',
-    route: '/spiritual-remedies'
   },
 ];
 
@@ -62,7 +49,7 @@ export default function HomeScreen() {
           <View style={styles.headerContent}>
             <View>
               <Text style={styles.greeting}>Namaste 🙏</Text>
-              <Text style={styles.userName}>Welcome back, Arjun</Text>
+              <Text style={styles.userName}>Welcome back</Text>
               <Text style={styles.date}>{currentDate}</Text>
             </View>
             <TouchableOpacity style={styles.notificationButton}>
@@ -96,8 +83,7 @@ export default function HomeScreen() {
             {quickServices.map((service, index) => (
               <TouchableOpacity 
                 key={index} 
-                style={styles.serviceCard}
-                onPress={() => router.push(service.route)}>
+                style={styles.serviceCard}>
                 <View style={[styles.serviceIcon, { backgroundColor: service.color + '20' }]}>
                   <service.icon color={service.color} size={24} />
                 </View>
@@ -105,49 +91,6 @@ export default function HomeScreen() {
                 <Text style={styles.serviceSubtitle}>{service.subtitle}</Text>
               </TouchableOpacity>
             ))}
-          </View>
-        </View>
-
-        {/* Zodiac Signs */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Zodiac Signs</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.zodiacContainer}>
-              {zodiacSigns.map((sign, index) => (
-                <TouchableOpacity 
-                  key={index} 
-                  style={styles.zodiacCard}
-                  onPress={() => router.push('/(tabs)/horoscope')}>
-                  <Text style={[styles.zodiacSymbol, { color: sign.color }]}>
-                    {sign.symbol}
-                  </Text>
-                  <Text style={styles.zodiacName}>{sign.name}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-
-        {/* Panchang */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Today's Panchang</Text>
-          <View style={styles.panchangCard}>
-            <View style={styles.panchangRow}>
-              <Text style={styles.panchangLabel}>Tithi:</Text>
-              <Text style={styles.panchangValue}>Saptami</Text>
-            </View>
-            <View style={styles.panchangRow}>
-              <Text style={styles.panchangLabel}>Nakshatra:</Text>
-              <Text style={styles.panchangValue}>Pushya</Text>
-            </View>
-            <View style={styles.panchangRow}>
-              <Text style={styles.panchangLabel}>Yoga:</Text>
-              <Text style={styles.panchangValue}>Shiva</Text>
-            </View>
-            <View style={styles.panchangRow}>
-              <Text style={styles.panchangLabel}>Karana:</Text>
-              <Text style={styles.panchangValue}>Balava</Text>
-            </View>
           </View>
         </View>
 
@@ -176,70 +119,6 @@ export default function HomeScreen() {
               <Text style={styles.consultButtonText}>Consult</Text>
             </TouchableOpacity>
           </TouchableOpacity>
-        </View>
-
-        {/* Premium Features */}
-        <View style={styles.section}>
-          <LinearGradient
-            colors={['#8B5CF6', '#A78BFA']}
-            style={styles.premiumCard}>
-            <Gift color="#FFFFFF" size={32} />
-            <View style={styles.premiumContent}>
-              <Text style={styles.premiumTitle}>Unlock Premium</Text>
-              <Text style={styles.premiumSubtitle}>
-                Get detailed birth chart analysis, daily remedies, and unlimited consultations
-              </Text>
-              <TouchableOpacity 
-                style={styles.premiumButton}
-                onPress={() => router.push('/auth')}>
-                <Text style={styles.premiumButtonText}>Upgrade Now</Text>
-              </TouchableOpacity>
-            </View>
-          </LinearGradient>
-        </View>
-
-        {/* Astro Store */}
-        <View style={styles.section}>
-          <View style={styles.storeHeader}>
-            <Text style={styles.sectionTitle}>Astro Store</Text>
-            <TouchableOpacity onPress={() => router.push('/products')}>
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.productsContainer}>
-              <TouchableOpacity 
-                style={styles.productCard}
-                onPress={() => router.push('/products')}>
-                <Image
-                  source={{ uri: 'https://images.pexels.com/photos/1191531/pexels-photo-1191531.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' }}
-                  style={styles.productImage}
-                />
-                <Text style={styles.productName}>Ruby Ring</Text>
-                <Text style={styles.productPrice}>₹25,000</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.productCard}
-                onPress={() => router.push('/products')}>
-                <Image
-                  source={{ uri: 'https://images.pexels.com/photos/6787202/pexels-photo-6787202.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' }}
-                  style={styles.productImage}
-                />
-                <Text style={styles.productName}>Shree Yantra</Text>
-                <Text style={styles.productPrice}>₹2,500</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.productCard}
-                onPress={() => router.push('/products')}>
-                <Image
-                  source={{ uri: 'https://images.pexels.com/photos/6787202/pexels-photo-6787202.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2' }}
-                  style={styles.productImage}
-                />
-                <Text style={styles.productName}>Rudraksha Mala</Text>
-                <Text style={styles.productPrice}>₹1,500</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -357,60 +236,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 2,
   },
-  zodiacContainer: {
-    flexDirection: 'row',
-    paddingRight: 20,
-  },
-  zodiacCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginRight: 12,
-    alignItems: 'center',
-    minWidth: 80,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  zodiacSymbol: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  zodiacName: {
-    fontSize: 12,
-    fontFamily: 'Inter-Medium',
-    color: '#374151',
-  },
-  panchangCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  panchangRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  panchangLabel: {
-    fontSize: 14,
-    fontFamily: 'Inter-Medium',
-    color: '#6B7280',
-  },
-  panchangValue: {
-    fontSize: 14,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#1F2937',
-  },
   astrologerCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
@@ -470,86 +295,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-SemiBold',
     color: '#FFFFFF',
-  },
-  premiumCard: {
-    borderRadius: 16,
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  premiumContent: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  premiumTitle: {
-    fontSize: 18,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#FFFFFF',
-  },
-  premiumSubtitle: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#FFFFFF',
-    marginTop: 4,
-    opacity: 0.9,
-  },
-  premiumButton: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginTop: 12,
-    alignSelf: 'flex-start',
-  },
-  premiumButtonText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#8B5CF6',
-  },
-  storeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  viewAllText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#F97316',
-  },
-  productsContainer: {
-    flexDirection: 'row',
-    paddingRight: 20,
-  },
-  productCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 12,
-    marginRight: 12,
-    alignItems: 'center',
-    width: 120,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  productImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  productName: {
-    fontSize: 12,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#1F2937',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  productPrice: {
-    fontSize: 12,
-    fontFamily: 'Inter-SemiBold',
-    color: '#10B981',
   },
 });

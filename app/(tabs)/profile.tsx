@@ -1,25 +1,23 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Settings, Bell, CreditCard, Star, Gift, CircleHelp as HelpCircle, LogOut, ChevronRight, Crown } from 'lucide-react-native';
+import { User, Settings, Bell, CreditCard, Star, CircleHelp as HelpCircle, LogOut, ChevronRight, Crown } from 'lucide-react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { supabase } from '@/lib/supabase';
 
 const profileStats = [
   { label: 'Consultations', value: '12' },
   { label: 'Reports', value: '5' },
-  { label: 'Match Reports', value: '3' }
+  { label: 'Favorites', value: '8' }
 ];
 
 const menuItems = [
-  { icon: User, title: 'Edit Profile', subtitle: 'Update your personal information', color: '#3B82F6', route: '/profile/edit' },
-  { icon: CreditCard, title: 'Wallet & Payments', subtitle: 'Manage your wallet and payment methods', color: '#10B981', route: '/profile/wallet' },
-  { icon: Star, title: 'My Reports', subtitle: 'View all your astrology reports', color: '#F59E0B', route: '/profile/reports' },
-  { icon: Bell, title: 'Notifications', subtitle: 'Manage your notification preferences', color: '#8B5CF6', route: '/profile/notifications' },
-  { icon: Gift, title: 'Refer & Earn', subtitle: 'Invite friends and earn rewards', color: '#EF4444', route: '/profile/referral' },
-  { icon: HelpCircle, title: 'Help & Support', subtitle: 'Get help and contact support', color: '#6B7280', route: '/profile/support' },
-  { icon: Settings, title: 'Settings', subtitle: 'App settings and preferences', color: '#374151', route: '/profile/settings' },
+  { icon: User, title: 'Edit Profile', subtitle: 'Update your personal information', color: '#3B82F6' },
+  { icon: CreditCard, title: 'Wallet & Payments', subtitle: 'Manage your wallet and payment methods', color: '#10B981' },
+  { icon: Star, title: 'My Reports', subtitle: 'View all your astrology reports', color: '#F59E0B' },
+  { icon: Bell, title: 'Notifications', subtitle: 'Manage your notification preferences', color: '#8B5CF6' },
+  { icon: HelpCircle, title: 'Help & Support', subtitle: 'Get help and contact support', color: '#6B7280' },
+  { icon: Settings, title: 'Settings', subtitle: 'App settings and preferences', color: '#374151' },
 ];
 
 export default function ProfileScreen() {
@@ -37,30 +35,16 @@ export default function ProfileScreen() {
         {
           text: 'Logout',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              const { error } = await supabase.auth.signOut();
-              if (error) {
-                Alert.alert('Error', 'Failed to logout. Please try again.');
-              } else {
-                router.replace('/auth');
-              }
-            } catch (error) {
-              Alert.alert('Error', 'An unexpected error occurred.');
-            }
+          onPress: () => {
+            Alert.alert('Success', 'You have been logged out successfully.');
           },
         },
       ]
     );
   };
 
-  const handleMenuPress = (route: string) => {
-    // For now, show a coming soon message for unimplemented routes
-    if (route.startsWith('/profile/')) {
-      Alert.alert('Coming Soon', 'This feature will be available in the next update.');
-    } else {
-      router.push(route);
-    }
+  const handleMenuPress = (title: string) => {
+    Alert.alert('Coming Soon', `${title} feature will be available in the next update.`);
   };
 
   return (
@@ -82,7 +66,7 @@ export default function ProfileScreen() {
             </View>
             <TouchableOpacity 
               style={styles.editButton}
-              onPress={() => handleMenuPress('/profile/edit')}>
+              onPress={() => handleMenuPress('Edit Profile')}>
               <Text style={styles.editButtonText}>Edit</Text>
             </TouchableOpacity>
           </View>
@@ -99,9 +83,7 @@ export default function ProfileScreen() {
               <Text style={styles.premiumSubtitle}>
                 Get unlimited consultations, detailed reports, and priority support
               </Text>
-              <TouchableOpacity 
-                style={styles.premiumButton}
-                onPress={() => router.push('/auth')}>
+              <TouchableOpacity style={styles.premiumButton}>
                 <Text style={styles.premiumButtonText}>Upgrade Now</Text>
               </TouchableOpacity>
             </View>
@@ -143,55 +125,6 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Wallet Balance */}
-        <View style={styles.section}>
-          <TouchableOpacity 
-            style={styles.walletCard}
-            onPress={() => handleMenuPress('/profile/wallet')}>
-            <View style={styles.walletHeader}>
-              <CreditCard color="#10B981" size={24} />
-              <Text style={styles.walletTitle}>Wallet Balance</Text>
-            </View>
-            <Text style={styles.walletBalance}>₹2,450</Text>
-            <TouchableOpacity 
-              style={styles.rechargeButton}
-              onPress={() => handleMenuPress('/profile/wallet')}>
-              <Text style={styles.rechargeButtonText}>Recharge Wallet</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </View>
-
-        {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.quickActionsGrid}>
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => router.push('/(tabs)/horoscope')}>
-              <Star color="#F59E0B" size={24} />
-              <Text style={styles.quickActionText}>Daily Horoscope</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => router.push('/love-match')}>
-              <User color="#8B5CF6" size={24} />
-              <Text style={styles.quickActionText}>Match Making</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => router.push('/(tabs)/kundli')}>
-              <Gift color="#EF4444" size={24} />
-              <Text style={styles.quickActionText}>Free Report</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.quickActionCard}
-              onPress={() => router.push('/spiritual-remedies')}>
-              <Bell color="#3B82F6" size={24} />
-              <Text style={styles.quickActionText}>Remedies</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* Menu Items */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
@@ -200,7 +133,7 @@ export default function ProfileScreen() {
               <TouchableOpacity 
                 key={index} 
                 style={styles.menuItem}
-                onPress={() => handleMenuPress(item.route)}>
+                onPress={() => handleMenuPress(item.title)}>
                 <View style={[styles.menuIcon, { backgroundColor: item.color + '20' }]}>
                   <item.icon color={item.color} size={20} />
                 </View>
@@ -403,70 +336,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-SemiBold',
     color: '#1F2937',
-  },
-  walletCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  walletHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  walletTitle: {
-    fontSize: 16,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#1F2937',
-    marginLeft: 8,
-  },
-  walletBalance: {
-    fontSize: 32,
-    fontFamily: 'Poppins-Bold',
-    color: '#10B981',
-    marginBottom: 16,
-  },
-  rechargeButton: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  rechargeButtonText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-SemiBold',
-    color: '#FFFFFF',
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  quickActionCard: {
-    width: '48%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  quickActionText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Medium',
-    color: '#374151',
-    textAlign: 'center',
-    marginTop: 8,
   },
   menuContainer: {
     backgroundColor: '#FFFFFF',

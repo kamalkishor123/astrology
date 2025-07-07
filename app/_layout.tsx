@@ -47,11 +47,6 @@ export default function RootLayout() {
     <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="auth" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="consultations" />
-        <Stack.Screen name="products" />
-        <Stack.Screen name="remedies" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" backgroundColor="#1E3A8A" />
