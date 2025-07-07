@@ -43,8 +43,8 @@ export default function ConsultationsScreen() {
     try {
       setLoading(true);
       
-      // Check if Supabase is properly configured
-      if (!process.env.EXPO_PUBLIC_SUPABASE_URL || !process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) {
+      // Check if Supabase client is available and properly configured
+      if (!supabase) {
         console.warn('Supabase environment variables not configured, using fallback data');
         setAstrologers(getFallbackAstrologers());
         return;
